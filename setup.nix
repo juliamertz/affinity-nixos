@@ -16,14 +16,16 @@ let
 
   binary = (pkgs.writeShellScriptBin "setup" script);
 in {
-  system.activationScripts.affinityCrimes = /*sh*/''
+  system.userActivationScripts.affinityCrimes.text = /*sh*/''
       license_violations=${cfg.licenseViolations}/WinMetadata
       prefix=${cfg.prefix}
       winmd_path=$prefix/drive_c/windows/system32/WinMetadata
 
       # Check if prefix exists, otherwise we create a new one
       if [ ! -e $prefix ]; then
-        ${binary}/bin/setup}
+        echo No prefix found at path $prefix
+        echo creating new wine prefix
+        ${binary}/bin/setup
       fi
 
       if [ -e $license_violations ]; then 

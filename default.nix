@@ -61,7 +61,10 @@ in {
       type = lib.types.nonEmptyStr;
       default = "";
     };
-
+    user = lib.mkOption { 
+      type = lib.types.nonEmptyStr;
+      default = "";
+    };
     designer.enable = lib.mkOption {
       type = lib.types.bool;
       default = false;
