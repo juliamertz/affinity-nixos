@@ -19,6 +19,32 @@ let
     publisher = bin "affinity-publisher" exec.publisher;
     run = bin "affinity-run" exec.run;
   };
+  desktop = {
+    photo = pkgs.makeDesktopItem {
+      name="affinity-photo";
+      desktopName = "Affinity Photo";
+      genericName = "Image Editor";
+      exec = "${pkg.photo}/bin/affinity-photo";
+      terminal = false;
+      categories = [ "Utility" ];
+    };
+    designer = pkgs.makeDesktopItem {
+      name="affinity-designer";
+      desktopName = "Affinity Designer";
+      genericName = "Vector Graphics editor";
+      exec = "${pkg.designer}/bin/affinity-designer";
+      terminal = false;
+      categories = [ "Utility" ];
+    };
+    publisher = pkgs.makeDesktopItem {
+      name="affinity-publisher";
+      desktopName = "Affinity Publisher";
+      genericName = "";
+      exec = "${pkg.publisher}/bin/affinity-publisher";
+      terminal = false;
+      categories = [ "Utility" ];
+    };
+  };
 in {
   imports = [
     ./wine.nix # ElementalWarrior wine build
@@ -28,11 +54,11 @@ in {
 
   options.affinity = {
     prefix = lib.mkOption { 
-      type = lib.types.str;
+      type = lib.types.nonEmptyStr;
       default = "";
     };
     licenseViolations = lib.mkOption { 
-      type = lib.types.str;
+      type = lib.types.nonEmptyStr;
       default = "";
     };
 
@@ -69,34 +95,10 @@ in {
   };
 
   config = {
-    home.packages = [ pkg.run ]
-      ++ lib.optionals cfg.photo.enable [ pkg.photo ]
-      ++ lib.optionals cfg.designer.enable [ pkg.designer ]
-      ++ lib.optionals cfg.publisher.enable [ pkg.publisher ];
-
-  #   xdg.${if cfg.desktopEntries.enable then "desktopEntries" else null} = {
-  #     ${if cfg.photo.enable then "photo" else null} = {
-  #       name = "Affinity Photo";
-  #       genericName = "Image Editor";
-  #       exec = "/home/${settings.user.username}/.nix-profile/bin/affinity-photo";
-  #       terminal = false;
-  #       categories = [ "Utility" ];
-  #     };
-  #     ${if cfg.designer.enable then "designer" else null} = {
-  #       name = "Affinity Designer";
-  #       genericName = "Vector Graphics editor";
-  #       exec = "/home/${settings.user.username}/.nix-profile/bin/affinity-designer";
-  #       terminal = false;
-  #       categories = [ "Utility" ];
-  #     };
-  #     ${if cfg.publisher.enable then "publisher" else null} = {
-  #       name = "Affinity Publisher";
-  #       genericName = "";
-  #       exec = "/home/${settings.user.username}/.nix-profile/bin/affinity-publisher";
-  #       terminal = false;
-  #       categories = [ "Utility" ];
-  #     };
-  #   };
+    environment.systemPackages = [ pkg.run ]
+      ++ lib.optionals cfg.photo.enable [ pkg.photo desktop.photo ]
+      ++ lib.optionals cfg.designer.enable [ pkg.designer desktop.designer ]
+      ++ lib.optionals cfg.publisher.enable [ pkg.publisher desktop.publisher ];
   };
 }
 
