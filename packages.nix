@@ -1,11 +1,20 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 let
   wrap = pkgs.callPackage ./wrap.nix { };
-  wineUnstable = pkgs.wineWow64Packages.full.override (old: {
-    wineRelease = "unstable";
-  });
+  wineUnstable =
+    pkgs.wineWow64Packages.full.override (old: { wineRelease = "unstable"; });
+in {
+  launchWrapper = env:
+    # https://github.com/lf-/affinity-crimes/blob/main/affinity.sh
+    pkgs.writeShellScriptBin "run" # bash
+    ''
+      (return 0 2>/dev/null) && sourced=1 || sourced=0
+      ${env}
 
-  wine-wrapped = wrap { 
+      if [[ $sourced == 0 ]]; then exec "$@"; fi
+    '';
+
+  wine = wrap {
     wine = wineUnstable.overrideAttrs (old: {
       src = pkgs.fetchFromGitLab {
         domain = "gitlab.winehq.org";
@@ -27,10 +36,5 @@ let
     };
     version = src.rev;
   });
-in {
-  environment.systemPackages = [ winetricks ];
-
-  nixpkgs.config.packageOverrides = pkgs: {
-    wineElementalWarrior = wine-wrapped;
-  };
 }
+

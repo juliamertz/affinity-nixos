@@ -2,10 +2,11 @@
 let
   cfg = config.affinity;
   bin = pkgs.writeShellScriptBin;
+  packages = pkgs.callPackage ./packages.nix {};
 
   prefix = ''WINE_PREFIX=${cfg.prefix}'';
   executables = ''${cfg.prefix}/drive_c/Program\ Files/Affinity'';
-  wine = "${pkgs.affinity}/bin/affinity wine";
+  wine = "${packages.launchWrapper cfg.env}/bin/run wine";
   
   exec = {
     photo = ''${prefix} ${wine} ${executables}/Photo\ 2/Photo.exe'';
@@ -47,8 +48,6 @@ let
   };
 in {
   imports = [
-    ./wine.nix # ElementalWarrior wine build
-    ./launcher.nix # Provides pkgs.affinity
     ./setup.nix # Installation step to create wine prefix
   ];
 
@@ -85,7 +84,7 @@ in {
     env = lib.mkOption {
       type = lib.types.str;
       default = /*bash*/''
-        winepath="${pkgs.wineElementalWarrior}"
+        winepath="${packages.wine}"
         export WINEPREFIX="${cfg.prefix}"
         export PATH="$winepath/bin:$PATH"
         export LD_LIBRARY_PATH="$winepath/lib''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"

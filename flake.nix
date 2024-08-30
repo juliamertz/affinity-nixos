@@ -1,29 +1,20 @@
 {
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-  };
+  inputs = { nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable"; };
 
-  outputs =
-    { nixpkgs, self, ... }@inputs:
-    {
-      packages = nixpkgs.lib.genAttrs [
-        "aarch64-linux"
-        "x86_64-linux"
-        "i686-linux"
-      ] (
-        system:
+  outputs = { nixpkgs, self, ... }@inputs: {
+    packages =
+      nixpkgs.lib.genAttrs [ "aarch64-linux" "x86_64-linux" "i686-linux" ]
+      (system:
         let
           inherit (nixpkgs) lib;
           pkgs = nixpkgs.legacyPackages.${system};
+          packages = pkgs.callPackage ./packages.nix { };
         in {
-          default = pkgs.writeShellScriptBin "affinity" ''echo Hello world!'';
-        }
-      );
+          inherit (packages) wine winetricks;
+          default = packages.wine;
+        });
 
-      nixosModules.affinity = { pkgs, ... }: {
-        imports = [ ./default.nix ];
-      };
-
+    nixosModules.affinity = { ... }: { imports = [ ./default.nix ]; };
   };
 }
 

@@ -14,7 +14,7 @@ let
     $winepath/bin/wine winecfg -v win11
   '';
 
-  binary = (pkgs.writeShellScriptBin "setup" script);
+  binary = pkgs.writeShellScriptBin "setup" script;
 in {
   system.userActivationScripts.affinityCrimes.text = /*sh*/''
       license_violations=${cfg.licenseViolations}/WinMetadata
