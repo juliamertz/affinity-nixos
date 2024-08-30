@@ -17,20 +17,20 @@ let
   binary = pkgs.writeShellScriptBin "setup" script;
 in {
   system.userActivationScripts.affinityCrimes.text = /*sh*/''
-      license_violations=${cfg.licenseViolations}/WinMetadata
-      prefix=${cfg.prefix}
-      winmd_path=$prefix/drive_c/windows/system32/WinMetadata
+      PREFIX=${cfg.prefix}
+      LICENSE_VIOLATIONS=${cfg.licenseViolations}/WinMetadata
+      WINMD_PATH=$PREFIX/drive_c/windows/system32/WinMetadata
 
       # Check if prefix exists, otherwise we create a new one
-      if [ ! -e $prefix ]; then
-        echo No prefix found at path $prefix
+      if [ ! -e $PREFIX ]; then
+        echo No prefix found at path $PREFIX
         echo creating new wine prefix
         ${binary}/bin/setup
       fi
 
-      if [ -e $license_violations ]; then 
-        if [ ! -e $winmd_path ]; then 
-          ln -s $license_violations $winmd_path
+      if [ -e $LICENSE_VIOLATIONS ]; then 
+        if [ ! -e $WINMD_PATH ]; then 
+          ln -s $LICENSE_VIOLATIONS $WINMD_PATH
           echo Symlinked winmd files to wine prefix
         fi
       else
