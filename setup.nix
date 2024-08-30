@@ -21,7 +21,7 @@ in {
 
         # this crime is required to make wineboot not try to install mono itself
         WINEDLLOVERRIDES="mscoree=" wineboot --init
-        $winepath/bin/wine msiexec /i "$winepath/share/wine/mono/wine-mono-8.1.0-x86.msi"
+        $winepath/bin/wine msiexec /i "$winepath/share/wine/mono/wine-mono-9.1.0-x86.msi"
         ${packages.winetricks}/bin/winetricks -q dotnet48 corefonts vcrun2015
         $winepath/bin/wine winecfg -v win11
       fi
