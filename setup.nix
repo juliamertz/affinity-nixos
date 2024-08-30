@@ -1,22 +1,26 @@
 { pkgs, config, ... }:
-let 
+let
   cfg = config.affinity;
+  packages = pkgs.callPackage ./packages.nix { };
   # https://github.com/lf-/affinity-crimes/blob/main/setup.sh
-  script = /* bash */ ''
-    #!/usr/bin/env bash
-    set -eu
-    ${cfg.env}
-        
-    # this crime is required to make wineboot not try to install mono itself
-    WINEDLLOVERRIDES="mscoree=" wineboot --init
-    $winepath/bin/wine msiexec /i "$winepath/share/wine/mono/wine-mono-8.1.0-x86.msi"
-    ${pkgs.winetricks}/bin/winetricks -q dotnet48 corefonts vcrun2015
-    $winepath/bin/wine winecfg -v win11
-  '';
+  script = # bash
+    ''
+      #!/usr/bin/env bash
+      set -eu
+      ${cfg.env}
+      mkdir -p $WINEPREFIX
+          
+      # this crime is required to make wineboot not try to install mono itself
+      WINEDLLOVERRIDES="mscoree=" wineboot --init
+      $winepath/bin/wine msiexec /i "$winepath/share/wine/mono/wine-mono-8.1.0-x86.msi"
+      ${packages.winetricks}/bin/winetricks -q dotnet48 corefonts vcrun2015
+      $winepath/bin/wine winecfg -v win11
+    '';
 
   binary = pkgs.writeShellScriptBin "setup" script;
 in {
-  system.userActivationScripts.affinityCrimes.text = /*sh*/''
+  system.userActivationScripts.affinityCrimes.text = # sh
+    ''
       PREFIX=${cfg.prefix}
       LICENSE_VIOLATIONS=${cfg.licenseViolations}/WinMetadata
       WINMD_PATH=$PREFIX/drive_c/windows/system32/WinMetadata
@@ -38,5 +42,5 @@ in {
         echo you will need winmd files from a windows install if you wish to use a Affinity version newer than the 1.10.3
         echo they are located in C:/windows/system32/WinMetadata and need to go in ${cfg.licenseViolations}
       fi
-      '';
+    '';
 }
