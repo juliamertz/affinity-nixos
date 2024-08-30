@@ -3,20 +3,6 @@ let
   cfg = config.affinity;
   packages = pkgs.callPackage ./packages.nix { };
   # https://github.com/lf-/affinity-crimes/blob/main/setup.sh
-  script = # bash
-    ''
-      #!/usr/bin/env bash
-      set -eu
-      ${cfg.env}
-          
-      # this crime is required to make wineboot not try to install mono itself
-      WINEDLLOVERRIDES="mscoree=" wineboot --init
-      $winepath/bin/wine msiexec /i "$winepath/share/wine/mono/wine-mono-8.1.0-x86.msi"
-      ${packages.winetricks}/bin/winetricks -q dotnet48 corefonts vcrun2015
-      $winepath/bin/wine winecfg -v win11
-    '';
-
-  binary = pkgs.writeShellScriptBin "setup" script;
 in {
   system.userActivationScripts.affinityCrimes.text = # sh
     ''
@@ -28,8 +14,16 @@ in {
       if [ ! -e $PREFIX ]; then
         echo No prefix found at path $PREFIX
         echo creating new wine prefix
+            
         mkdir -p $PREFIX
-        ${binary}/bin/setup
+        set -eu
+        ${cfg.env}
+
+        # this crime is required to make wineboot not try to install mono itself
+        WINEDLLOVERRIDES="mscoree=" wineboot --init
+        $winepath/bin/wine msiexec /i "$winepath/share/wine/mono/wine-mono-8.1.0-x86.msi"
+        ${packages.winetricks}/bin/winetricks -q dotnet48 corefonts vcrun2015
+        $winepath/bin/wine winecfg -v win11
       fi
 
       if [ -e $LICENSE_VIOLATIONS ]; then 
