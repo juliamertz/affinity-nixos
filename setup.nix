@@ -8,7 +8,6 @@ let
       #!/usr/bin/env bash
       set -eu
       ${cfg.env}
-      mkdir -p $WINEPREFIX
           
       # this crime is required to make wineboot not try to install mono itself
       WINEDLLOVERRIDES="mscoree=" wineboot --init
@@ -29,6 +28,7 @@ in {
       if [ ! -e $PREFIX ]; then
         echo No prefix found at path $PREFIX
         echo creating new wine prefix
+        mkdir -p $PREFIX
         ${binary}/bin/setup
       fi
 
