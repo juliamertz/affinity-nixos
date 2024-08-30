@@ -1,3 +1,5 @@
+# Archived in favor of https://github.com/mrshmllow/affinity-nix
+
 # Affinity wine nix configuration
 
 #### This flake does a few things to greatly simplify the process of installing Affinity applications on linux
